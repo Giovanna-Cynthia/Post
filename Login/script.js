@@ -1,22 +1,36 @@
-const form = document.getElementById("form")
+const button = document.getElementById("form");
 
-form.addEventListener("submit", (e) =>{
-    const nome = document.getElementById("nome");
-    const email = document.getElementById("email");
+button.addEventListener("click", (e) => {
+  const senha = document.getElementById("password");
+  const email = document.getElementById("email");
 
-    e.preventDefault();    
-    
-    const userData = JSON.stringify({
-        nome: nome.value,
-        email: email.value
+  e.preventDefault();
+
+  const userData = JSON.stringify({
+    password: senha.value,
+    email: email.value,
+  });
+
+  fetch("http://10.92.198.38:8080/auth/signin", {
+    method: "POST",
+    body: userData,
+    headers: { "Content-type": "application/json; charset=UTF-8" },
+  })
+    .then((result) => {
+      return result.json();
     })
-    
-    fetch("http://10.92.198.38:8080/auth/signin", {
-        method: "Post",
-        body: userData,
-        headers: {"Content-type": "application/json; charset=UTF-8"}
+    .then((data) => {
+      // Verifica se a resposta da API contém um token
+      if (data.token) {
+        // Armazena o token no localStorage
+        localStorage.setItem("token", data.token);
+        console.log("Token armazenado com sucesso:", data.token);
+        window.location.href = "/Postagem/index.html";
+      } else {
+        console.log("Token não encontrado na resposta da API");
+      }
     })
-        .then((result) => result.json())
-        .then((data) => console.log(data))
-        .then((err) => console.log(err));
-    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
